@@ -22,7 +22,7 @@ class Game {
         this.scanner = new Scanner(System.in);
         initializePlayers();
         // Draw initial top card from deck
-        this.topCard = deck.deck.removeFirst();
+        this.topCard = deck.deck.remove(0);
     }
 
     public Deck getDeck(){
@@ -55,9 +55,15 @@ class Game {
 
     public void initializePlayers() {
         System.out.println("\n=============== Welcome to UNO! ===============");
-        System.out.print("Enter number of players (2-4): ");
-        int numPlayers = scanner.nextInt();
-        
+        int numPlayers = 0;
+        while (numPlayers < 2 || numPlayers > 4) {
+            System.out.print("Enter number of players (2-4): ");
+            numPlayers = scanner.nextInt();
+            if (numPlayers < 2 || numPlayers > 4) {
+                System.out.println("Invalid number of players. Please enter a number between 2 and 4.");
+            }
+        }
+
         for (int i = 1; i <= numPlayers; i++) {
             System.out.print("Enter name for Player " + i + " (type 'bot' for AI player): ");
             String name = scanner.next();
@@ -67,7 +73,7 @@ class Game {
                 players.addPlayer(new Player(name, false));
             }
         }
-    
+
         // Fixed card distribution
         PlayerNode current = players.getFirstNode();
         for (int i = 0; i < numPlayers; i++) {
@@ -79,6 +85,8 @@ class Game {
 
     public void startGame() {
         System.out.println("The game begins!");
+        if (topCard instanceof WildCard || topCard instanceof WildDrawFourCard) topCard = deck.deck.remove(0);
+
         while (!isGameOver) {
             takeTurn();
         }
@@ -198,7 +206,7 @@ class Game {
     }
 
     public String chooseColor(Player player) {
-        String colors[] = {"Red", "Green", "Blue", "Yellow"};
+        String[] colors = {"red", "green", "blue", "yellow"};
         if (player.getIsBot()) {
             return colors[new Random().nextInt(colors.length)];
         } else {

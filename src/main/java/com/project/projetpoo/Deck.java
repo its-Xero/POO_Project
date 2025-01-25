@@ -49,7 +49,7 @@ public class Deck {
 
         for (int i = 0; i < n; i++) {
             if (!deck.isEmpty()) {
-                Card card = deck.removeFirst();
+                Card card = deck.remove(0);
                 player.draw(card);
             } else {
                 System.out.println("No more cards in the deck.");

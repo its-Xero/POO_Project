@@ -11,8 +11,10 @@ import javafx.scene.layout.*;
 //import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
+import java.io.InputStream;
 import java.util.Objects;
+
+//import java.util.Objects;
 
 
 public class UNOgameApp extends Application {
@@ -26,7 +28,7 @@ public class UNOgameApp extends Application {
         launch(args);
     }
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) {
         game = new Game();
         primaryStage.setTitle("UNO Game");
 
@@ -60,17 +62,20 @@ public class UNOgameApp extends Application {
 
         // Scene setup
         Scene scene = new Scene(root, 800, 600);
+
+        // Link the CSS file to the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void startGame(){
+    public void startGame(){
         game.startGame();
         updateUI();
     }
 
-    private void updateUI(){
+    public void updateUI() {
         Player currentPlayer = game.getCurrentPlayer();
         currentPlayerLabel.setText("Current Player: " + currentPlayer.getNom());
         topCardLabel.setText("Top Card: " + game.getTopCard().toString());
@@ -78,8 +83,16 @@ public class UNOgameApp extends Application {
         // Display player's hand
         playerHandBox.getChildren().clear();
         for (Card card : currentPlayer.getHand()) {
+            System.out.println("Adding card to UI: " + card); // Debugging statement
+
             Button cardButton = new Button();
-            cardButton.setGraphic(new ImageView(getCardImage(card)));
+            Image cardImage = getCardImage(card);
+            if (cardImage == null) {
+                System.err.println("Card image is null for: " + card); // Debugging statement
+            } else {
+                cardButton.setGraphic(new ImageView(cardImage));
+            }
+
             cardButton.setOnAction(_ -> playCard(card));
             playerHandBox.getChildren().add(cardButton);
         }
@@ -88,7 +101,7 @@ public class UNOgameApp extends Application {
         gameLogBox.getChildren().add(new Label("Turn: " + currentPlayer.getNom()));
     }
 
-    private void playCard(Card card){
+    public void playCard(Card card){
         Player currentPlayer = game.getCurrentPlayer();
         if (game.isCardPlayable(card, game.getTopCard())) {
             game.playCard(currentPlayer, card);
@@ -103,7 +116,7 @@ public class UNOgameApp extends Application {
         }
     }
 
-    private void handleSpecialCard(Card card) {
+    public void handleSpecialCard(Card card) {
         if (card instanceof WildCard) {
             // Show color selection dialog for Wild card
             ColorDialog colorDialog = new ColorDialog();
@@ -134,9 +147,16 @@ public class UNOgameApp extends Application {
         }
     }
 
-    private Image getCardImage(Card card){
-        //String imagePath = "cards/" + card.getCouleur() + "_" + card.getSymbol() + ".png";
-        String imagePath = "cards/red_0.png";
-        return new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+    public Image getCardImage(Card card) {
+        String imagePath = "cards/" + card.getCouleur() + "_" + card.getSymbol() + ".png";
+        System.out.println("Loading image: " + imagePath); // Debugging statement
+
+        InputStream imageStream = getClass().getResourceAsStream(imagePath);
+        if (imageStream == null) {
+            System.err.println("Image not found: " + imagePath); // Debugging statement
+            return null; // Return null if the image is not found
+        }
+
+        return new Image(imageStream);
     }
 }
