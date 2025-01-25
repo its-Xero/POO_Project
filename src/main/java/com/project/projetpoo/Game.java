@@ -85,7 +85,7 @@ class Game {
 
     public void startGame() {
         System.out.println("The game begins!");
-        if (topCard instanceof WildCard || topCard instanceof WildDrawFourCard) topCard = deck.deck.remove(0);
+        while (topCard instanceof WildCard || topCard instanceof WildDrawFourCard) topCard = deck.deck.remove(0);
 
         while (!isGameOver) {
             takeTurn();
