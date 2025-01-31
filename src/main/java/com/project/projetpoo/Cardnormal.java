@@ -2,9 +2,8 @@ package com.project.projetpoo;
 
 public class Cardnormal extends Card{
     
-    Cardnormal(String coleur, String symbol){
+    public Cardnormal(String coleur, String symbol){
         super(coleur, symbol);
-        
     }
 
 

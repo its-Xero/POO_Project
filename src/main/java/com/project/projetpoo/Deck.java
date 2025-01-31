@@ -19,8 +19,8 @@ public class Deck {
             deck.add(new Card(coleur, "0"));
 
             for (int i = 1; i <= 9; i++) {
-                deck.add(new Card(coleur, String.valueOf(i)));
-                deck.add(new Card(coleur, String.valueOf(i)));
+                deck.add(new Cardnormal(coleur, String.valueOf(i)));
+                deck.add(new Cardnormal(coleur, String.valueOf(i)));
             }
 
             deck.add(new Drawtwo(coleur));
