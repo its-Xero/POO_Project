@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Random;
 
-public class Game {
+public class Gamegui {
     private final Deck deck;
     private final PlayersList players;
     private final ArrayList<Card> cardsUpCard;
@@ -13,7 +13,7 @@ public class Game {
     private boolean isClockwise;
     private final Scanner scanner;
 
-    public Game() {
+    public Gamegui() {
         this.deck = new Deck();
         this.players = new PlayersList();
         this.cardsUpCard = new ArrayList<>();
@@ -25,8 +25,33 @@ public class Game {
         this.topCard = deck.deck.removeFirst();
     }
 
+    public Deck getDeck(){
+        return deck;
+    }
+
+    public Card getTopCard(){
+        return topCard;
+    }
+
     public Player getCurrentPlayer(){
         return players.getCurrentPlayer();
+    }
+
+
+    public boolean isGameOver() {
+        return players.getCurrentPlayer().getHand().isEmpty();
+    }
+
+    public boolean isClockwise(){
+        return isClockwise;
+    }
+
+    public Player getPreviousPlayer(){
+        return players.getPreviousPlayer();
+    }
+
+    public void setClockwise(boolean isClockwise){
+        this.isClockwise = isClockwise;
     }
 
 
@@ -90,7 +115,7 @@ public class Game {
         // Update the bot's reference card and deck
         bot.setCardsup(topCard);
         bot.setDeck(deck);
-        
+
         System.out.println("the bot's name is :" + bot.getNom() + "'s hand size: " + bot.getHand().size());
         bot.displayPlayableCards(topCard);
         Card cardToPlay = bot.playplayableCard();
@@ -109,16 +134,16 @@ public class Game {
         for (int i = 0; i < player.getHand().size(); i++) {
             System.out.println((i + 1) + ": " + player.getHand().get(i));
         }
-        
+
         System.out.println("\nPlayable cards:");
         for (int i = 0; i < playableCards.size(); i++) {
             System.out.println((i + 1) + ": " + playableCards.get(i));
         }
-    
+
         if (!playableCards.isEmpty()) {
             System.out.print("Enter the number of the card you want to play (0 to draw): ");
             int choice = scanner.nextInt();
-    
+
             if (choice == 0) {
                 deck.drawCard(player, 1);
                 System.out.println("You drew a card");
@@ -138,7 +163,7 @@ public class Game {
         player.play(card); // Remove the card from the player's hand
         cardsUpCard.add(topCard); // Add the previous top card to the discard pile
         topCard = card; // Set the new top card
-        handleSpecialCard(topCard);
+        //handleSpecialCard(topCard);
         moveToNextPlayer(); // Move to the next player
     }
 
@@ -179,7 +204,7 @@ public class Game {
         String color = chooseColor(players.getCurrentPlayer());
         System.out.println(players.getCurrentPlayer().getNom() + " chose " + color);
         topCard.setCouleur(color);
-        
+
         Player nextPlayer = players.getNextPlayer();
         deck.drawCard(nextPlayer, 4);
     }
@@ -217,10 +242,17 @@ public class Game {
         if (card instanceof WildCard || card instanceof WildDrawFourCard) {
             return true;
         }
-        
+
         // Match color or symbol for non-wild cards
-        return card.getCouleur().equals(topCard.getCouleur()) || 
-               card.getSymbol().equals(topCard.getSymbol());
+        return card.getCouleur().equals(topCard.getCouleur()) ||
+                card.getSymbol().equals(topCard.getSymbol());
     }
 
+    public Player getNextPlayer() {
+        return players.getNextPlayer();
+    }
+
+    public void setTopCard(Card topCard) {
+        this.topCard = topCard;
+    }
 }
