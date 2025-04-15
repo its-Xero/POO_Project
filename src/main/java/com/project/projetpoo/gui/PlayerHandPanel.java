@@ -2,43 +2,82 @@ package com.project.projetpoo.gui;
 
 import com.project.projetpoo.Player;
 import com.project.projetpoo.Card;
-import com.project.projetpoo.Game;
 import com.project.projetpoo.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 
 public class PlayerHandPanel extends JPanel {
     private Player player;
     private final Gamegui game;
     private final UNOGUI gui;
-    private JButton drawCardButton;
+    private JPanel cardsPanel; // Panel to hold the cards
 
     public PlayerHandPanel(Player player, Gamegui game, UNOGUI gui) {
         this.player = player;
         this.game = game;
         this.gui = gui;
-        setBackground(Color.WHITE);
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new BorderLayout()); // Use BorderLayout for the main panel
         initializeComponents();
         updateHand();
     }
 
     private void initializeComponents() {
-        // Add "Draw Card" button
-        drawCardButton = new JButton("Draw Card");
+        // Panel to hold the cards (will be scrollable)
+        cardsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        cardsPanel.setBackground(Color.WHITE);
+
+        // Scroll pane for the cards
+        // Scroll pane for the cards
+        JScrollPane scrollPane = new JScrollPane(cardsPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(800, 150)); // Adjust size as needed
+
+        // "Draw Card" button (fixed at the bottom)
+        JButton drawCardButton = new JButton("Draw Card");
         drawCardButton.setFont(new Font("Arial", Font.BOLD, 14));
-        drawCardButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                game.getDeck().drawCard(player, 1);
-                gui.logMessage(player.getNom() + " draws a card.");
-                gui.updateGameState();
-            }
+        drawCardButton.addActionListener(_ -> {
+            game.getDeck().drawCard(player, 1);
+            gui.logMessage(player.getNom() + " draws a card.");
+            gui.updateGameState();
         });
-        add(drawCardButton);
+
+        // Add components to the main panel
+        add(scrollPane, BorderLayout.CENTER); // Cards in the center (scrollable)
+        add(drawCardButton, BorderLayout.SOUTH); // Button at the bottom (always visible)
+    }
+
+    public void updateHand() {
+        cardsPanel.removeAll(); // Clear the cards panel before updating
+
+        for (Card card : player.getHand()) {
+            ImageIcon icon = loadCardImage(card);
+            if (icon != null) {
+                JButton cardButton = new JButton(icon);
+                cardButton.setPreferredSize(new Dimension(80, 120));
+                cardButton.addActionListener(_ -> {
+                    if (game.isCardPlayable(card, game.getTopCard())) {
+                        handleSpecialCardEffect(card);
+                        game.playCard(player, card);
+                        gui.logMessage(player.getNom() + " plays " + getCardDisplayName(card));
+
+                        if (player.getHand().isEmpty()) {
+                            gui.checkGameOver();
+                        }
+                        gui.updateGameState();
+                    } else {
+                        JOptionPane.showMessageDialog(PlayerHandPanel.this,
+                                "You cannot play this card!", "Invalid Move", JOptionPane.WARNING_MESSAGE);
+                    }
+                });
+                cardsPanel.add(cardButton);
+            }
+        }
+
+        cardsPanel.revalidate();
+        cardsPanel.repaint();
     }
 
     private ImageIcon loadCardImage(Card card) {
@@ -67,6 +106,7 @@ public class PlayerHandPanel extends JPanel {
         }
     }
 
+    @SuppressWarnings("IfCanBeSwitch")
     private String getCardImagePath(Card card) {
         if (card instanceof WildCard) {
             return "images/wild.png";
@@ -84,7 +124,7 @@ public class PlayerHandPanel extends JPanel {
     }
 
 
-    public void updateHand() {
+    /*public void updateHand() {
         removeAll(); // Clear the panel before updating
         for (Card card : player.getHand()) {
             ImageIcon icon = loadCardImage(card);
@@ -120,7 +160,7 @@ public class PlayerHandPanel extends JPanel {
         add(drawCardButton); // Re-add the "Draw Card" button
         revalidate();
         repaint();
-    }
+    }*/
 
     private void handleSpecialCardEffect(Card card) {
         if (card instanceof WildCard) {
@@ -141,7 +181,7 @@ public class PlayerHandPanel extends JPanel {
         if (color != null && (color.equalsIgnoreCase("red") || color.equalsIgnoreCase("green") ||
                 color.equalsIgnoreCase("blue") || color.equalsIgnoreCase("yellow"))) {
             // Update the card's color BEFORE playing it
-            ((WildCard) card).setCouleur(color); // Update the card being played
+            card.setCouleur(color); // Update the card being played
             gui.logMessage(player.getNom() + " chose " + color + " for the Wild Card.");
         } else {
             JOptionPane.showMessageDialog(this, "Invalid color! Please choose again.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -154,7 +194,7 @@ public class PlayerHandPanel extends JPanel {
         if (color != null && (color.equalsIgnoreCase("red") || color.equalsIgnoreCase("green") ||
                 color.equalsIgnoreCase("blue") || color.equalsIgnoreCase("yellow"))) {
             // Update the card's color BEFORE playing it
-            ((WildDrawFourCard) card).setCouleur(color); // Update the card being played
+            card.setCouleur(color); // Update the card being played
             Player nextPlayer = game.getNextPlayer();
             game.getDeck().drawCard(nextPlayer, 4);
             gui.logMessage(nextPlayer.getNom() + " draws 4 cards!");
@@ -182,6 +222,7 @@ public class PlayerHandPanel extends JPanel {
     }
 
     // Helper method to get a user-friendly display name for cards
+    @SuppressWarnings("IfCanBeSwitch")
     private String getCardDisplayName(Card card) {
         if (card instanceof WildCard) {
             return "Wild";

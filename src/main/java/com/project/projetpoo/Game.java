@@ -209,7 +209,7 @@ public class Game {
     }
 
     public void checkGameOver() {
-        isGameOver = players.getCurrentPlayer().getHand().isEmpty();
+        isGameOver = players.getPreviousPlayer().getHand().isEmpty();
     }
 
     public boolean isCardPlayable(Card card, Card topCard) {

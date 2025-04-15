@@ -39,7 +39,7 @@ public class Gamegui {
 
 
     public boolean isGameOver() {
-        return players.getCurrentPlayer().getHand().isEmpty();
+        return players.getPreviousPlayer().getHand().isEmpty();
     }
 
     public boolean isClockwise(){
@@ -164,6 +164,7 @@ public class Gamegui {
         cardsUpCard.add(topCard); // Add the previous top card to the discard pile
         topCard = card; // Set the new top card
         //handleSpecialCard(topCard);
+        checkGameOver();
         moveToNextPlayer(); // Move to the next player
     }
 
