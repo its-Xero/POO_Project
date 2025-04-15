@@ -1,6 +1,5 @@
 package com.project.projetpoo.gui;
 
-import com.project.projetpoo.Game;
 import com.project.projetpoo.Player;
 import com.project.projetpoo.Card;
 import com.project.projetpoo.*;
@@ -54,6 +53,7 @@ public class UNOGUI extends JFrame {
     }
 
     public void updateGameState() {
+
         // Update the top card display
         topCardPanel.setTopCard(game.getTopCard());
 
